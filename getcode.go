@@ -65,7 +65,7 @@ func (p *GcParams) getAutoCode() (string, error) {
 			code := r.URL.Query().Get("code")
 			if len(code) == 0 {
 				fmt.Fprintf(w, `<html><head><title>Status</title></head><body><p>Erorr.</p></body></html>`)
-				s.Response <- authCode{Err: fmt.Errorf("Not found code.")}
+				s.Response <- authCode{Err: fmt.Errorf("not found code")}
 				return
 			}
 			fmt.Fprintf(w, `<html><head><title>Status</title></head><body><p>The authentication was done. Please close this page.</p></body></html>`)
@@ -84,7 +84,6 @@ func (p *GcParams) getAutoCode() (string, error) {
 		<-s.End
 		Listener.Close()
 		s.Response <- authCode{Err: err}
-		return
 	}(p.Port)
 	<-s.Start
 	var cmd *exec.Cmd
@@ -96,19 +95,19 @@ func (p *GcParams) getAutoCode() (string, error) {
 	case "windows":
 		cmd = exec.Command("cmd", "/c", "start", strings.Replace(p.AuthURL, "&", `^&`, -1))
 	default:
-		return "", fmt.Errorf("Go manual mode.")
+		return "", fmt.Errorf("go manual mode")
 	}
 	if err := cmd.Start(); err != nil {
-		return "", fmt.Errorf("Go manual mode.")
+		return "", fmt.Errorf("go manual mode")
 	}
 	var result authCode
 	select {
 	case result = <-s.Response:
 	case <-time.After(time.Duration(p.Twait) * time.Second):
-		return "", fmt.Errorf("Go manual mode.")
+		return "", fmt.Errorf("go manual mode")
 	}
 	if result.Err != nil {
-		return "", fmt.Errorf("Go manual mode.")
+		return "", fmt.Errorf("go manual mode")
 	}
 	return result.Code, nil
 }
